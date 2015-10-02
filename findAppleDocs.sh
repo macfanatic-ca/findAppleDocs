@@ -10,8 +10,9 @@ appleSupportURL=https://support.apple.com/en-us/
 # Display help if asked
 if [[ $1 == *"-h" ]] || [[ $1 == *"-help" ]]; then
         echo "Welcome to findAppleDocs
-Usage: findAppleDocs HT205001 /path/to/results.csv
-Note: If you don't specify a path, the file will be placed in the current working directory"
+Usage: findAppleDocs HT205001 /path/to/results.(csv)(md)
+Note: If you don't specify a full path, the file will be placed in the current working directory.
+Ending the destination with .csv or .md will adjust the output accordingly"
         exit 3
 fi
 # Exit if no starting article given
@@ -38,6 +39,11 @@ if [[ ! -w $resultDest ]]; then
         exit 10
 fi
 fi
+# If destination is Markdown, format as table
+if [[ "$resultDest" == *".md" ]]; then
+        echo "| URL | Title |" >> "$resultDest"
+        echo "| --- | --- |" >> "$resultDest"
+fi
 # Start the count at 0
 failedSearches=0
 # Increment the Article Number when called
@@ -52,10 +58,12 @@ grabInfo() {
        pageTitle=`curl -s $appleSupportURL$articleToSearch | grep "<title>" | sed 's# - Apple Support</title>##' | sed 's#[[:blank:]][[:blank:]][[:blank:]]<title>##'`
         if [[ "$pageTitle" != *"404"* ]]; then
                 failedSearches=0
-                if [[ ! -z "$resultDest" ]]; then
-                echo "$appleSupportURL$articleToSearch,$pageTitle" >> "$resultDest"
+                if [[ "$resultDest" == *".csv" ]]; then
+                        echo "$appleSupportURL$articleToSearch,$pageTitle" >> "$resultDest"
+                elif [[ "$resultDest" == *".md" ]]; then
+                        echo "| $appleSupportURL$articleToSearch | $pageTitle |" >> "$resultDest"
                 else
-                echo "$appleSupportURL$articleToSearch - $pageTitle"
+                        echo "$appleSupportURL$articleToSearch - $pageTitle"
                 fi
         else
                 failedSearches=$[$failedSearches +1]
