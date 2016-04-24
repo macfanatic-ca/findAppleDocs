@@ -14,7 +14,7 @@ if [[ $1 == *"-h"* ]] || [[ $1 == *"-help"* ]]; then
         echo "#########################"
         #echo -e "\n"
         echo "Usage:
-        findAppleDocs HT205001 /path/to/results.(csv)(md)"
+        findAppleDocs HT205001 /path/to/results.[csv || md]"
         #echo -e "\n"
         echo "Info:
         The Article Number supplied will be pre-fixed with 'https://support.apple.com/en-us/'"
